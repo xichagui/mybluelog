@@ -7,7 +7,6 @@
 
 import os
 
-
 # 嵌套返回上层路径
 # /Users/Cha/Developer/mybluelog
 # /Users/Cha/Developer/mybluelog/bluelog
@@ -32,6 +31,8 @@ class BaseConfig(object):
     BLUELOG_POST_PER_PAGE = 10
     BLUELOG_MANAGE_POST_PER_PAGE = 15
     BLUELOG_COMMENT_PER_PAGE = 15
+    BLUELOG_ADMIN_EMAIL = os.getenv('BLUELOG_ADMIN_EMAIL')
+    ALLOW_TO_SEND_EMAIL = os.getenv('ALLOW_TO_SEND_EMAIL', False)
 
 
 class DevelopmentConfig(BaseConfig):
@@ -47,11 +48,7 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        'sqlite:///' +
-        os.path.join(
-            basedir,
-            'data.db'))
+        'DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'data.db'))
 
 
 config = {

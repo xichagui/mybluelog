@@ -8,11 +8,13 @@ verify_ssl = true
 [packages]
 flask = "*"
 python-dotenv = "*"
-flask-bootstrap = "*"
 flask-sqlalchemy = "*"
 flask-mail = "*"
 flask-ckeditor = "*"
 flask-moment = "*"
+flask-wtf = "*"
+faker = "*"
+bootstrap-flask = "*"
 
 [requires]
 python_version = "3.7"
