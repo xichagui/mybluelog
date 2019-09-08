@@ -34,6 +34,11 @@ class BaseConfig(object):
     BLUELOG_ADMIN_EMAIL = os.getenv('BLUELOG_ADMIN_EMAIL')
     ALLOW_TO_SEND_EMAIL = os.getenv('ALLOW_TO_SEND_EMAIL', False)
 
+    BLUELOG_THEMES = {
+        'perfect_blue': 'Perfect Blue',
+        'black_swan': 'Black Swan'
+    }
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + \
