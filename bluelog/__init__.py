@@ -11,11 +11,12 @@ from bluelog.blueprints.admin import admin_bp
 from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.commands import register_commands
-from bluelog.extensions import (bootstrap, ckeditor, db, login_manager, mail,
-                                moment)
+from bluelog.extensions import (bootstrap, ckeditor, csrf, db, login_manager,
+                                mail, moment)
 from bluelog.models import Admin, Category
 from bluelog.settings import config
 from flask import Flask, render_template
+from flask_wtf.csrf import CSRFError
 
 
 def create_app(config_name=None):
@@ -45,6 +46,7 @@ def register_extensions(app):
     moment.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
 
 
 def register_blueprint(app):
@@ -79,3 +81,7 @@ def register_errors(app):
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return render_template('errors/400.html', description=e.description), 400

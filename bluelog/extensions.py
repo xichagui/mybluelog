@@ -11,6 +11,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -18,6 +19,7 @@ moment = Moment()
 ckeditor = CKEditor()
 mail = Mail()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 
 @login_manager.user_loader
