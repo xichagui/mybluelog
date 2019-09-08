@@ -11,7 +11,8 @@ from bluelog.blueprints.admin import admin_bp
 from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.commands import register_commands
-from bluelog.extensions import bootstrap, ckeditor, db, mail, moment
+from bluelog.extensions import (bootstrap, ckeditor, db, login_manager, mail,
+                                moment)
 from bluelog.models import Admin, Category
 from bluelog.settings import config
 from flask import Flask, render_template
@@ -43,6 +44,7 @@ def register_extensions(app):
     ckeditor.init_app(app)
     moment.init_app(app)
     mail.init_app(app)
+    login_manager.init_app(app)
 
 
 def register_blueprint(app):
