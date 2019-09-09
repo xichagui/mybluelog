@@ -13,9 +13,10 @@ from bluelog.blueprints.blog import blog_bp
 from bluelog.commands import register_commands
 from bluelog.extensions import (bootstrap, ckeditor, csrf, db, login_manager,
                                 mail, moment)
-from bluelog.models import Admin, Category
+from bluelog.models import Admin, Category, Comment
 from bluelog.settings import config
 from flask import Flask, render_template
+from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
 
@@ -66,7 +67,13 @@ def register_template_context(app):
     def make_template_context():
         admin = Admin.query.first()
         categories = Category.query.order_by(Category.name).all()
-        return dict(admin=admin, categories=categories)
+        if current_user.is_authenticated:
+            unread_comments = Comment.query.filter_by(reviewed=False).count()
+        else:
+            unread_comments = None
+        return dict(admin=admin,
+                    categories=categories,
+                    unread_comments=unread_comments)
 
 
 def register_errors(app):
@@ -84,4 +91,5 @@ def register_errors(app):
 
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
-        return render_template('errors/400.html', description=e.description), 400
+        return render_template('errors/400.html',
+                               description=e.description), 400

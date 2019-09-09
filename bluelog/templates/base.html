@@ -27,6 +27,40 @@
                     {{ render_nav_item('blog.index', text='Home') }}
                     {{ render_nav_item('blog.about', text='About') }}
                 </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                New <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a href="{{ url_for('admin.new_post') }}" class="dropdown-item">Post</a>
+                                <a href="{{ url_for('admin.new_category') }}" class="dropdown-item">Category</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                Manage <span class="caret"></span>
+                                {% if unread_comments %}
+                                    <span class="badge badge-success">new</span>
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a href="{{ url_for('admin.manager_post') }}" class="dropdown-item">Post</a>
+                                <a href="{{ url_for('admin.manager_category') }}" class="dropdown-item">Category</a>
+                                <a href="{{ url_for('admin.settings') }}" class="dropdown-item">Comment
+                                    {% if unread_comments %}
+                                        <span class="badge badge-success">{{ unread_comments }}</span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </li>
+                        {{ render_nav_item('admin.settings', 'Settings') }}
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
