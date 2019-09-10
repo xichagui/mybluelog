@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Category{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Category
+            <small class="text-muted">{{ categories|length }}</small>
+            <span class="float-right"><a href="{{ url_for('.new_category') }}"
+                                         class="btn btn-primary btn-sm">New post</a></span>
+        </h1>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Posts</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        {% for category in categories %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="{{ url_for('blog.show_category', category_id=category.id) }}">{{ category.name }}</a></td>
+                <td>{{ category.posts|length }}</td>
+                <td>
+                    {% if category.id != 1 %}
+                        <a href="{{ url_for('.edit_category', category_id=category.id, next=request.full_path) }}"
+                           class="btn btn-info btn-sm">Edit</a>
+                        <form action="{{ url_for('.delete_category', category_id=category.id, next=request.full_path) }}"
+                              class="inline" method="post"><input type="hidden" name="csrf_token"
+                                                                  value="{{ csrf_token() }}"/>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete
+                            </button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
