@@ -49,9 +49,9 @@
                                 {% endif %}
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a href="{{ url_for('admin.manager_post') }}" class="dropdown-item">Post</a>
-                                <a href="{{ url_for('admin.manager_category') }}" class="dropdown-item">Category</a>
-                                <a href="{{ url_for('admin.settings') }}" class="dropdown-item">Comment
+                                <a href="{{ url_for('admin.manage_post') }}" class="dropdown-item">Post</a>
+                                <a href="{{ url_for('admin.manage_category') }}" class="dropdown-item">Category</a>
+                                <a href="{{ url_for('admin.manage_comment') }}" class="dropdown-item">Comment
                                     {% if unread_comments %}
                                         <span class="badge badge-success">{{ unread_comments }}</span>
                                     {% endif %}

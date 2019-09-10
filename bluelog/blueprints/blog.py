@@ -111,11 +111,14 @@ def show_post(post_id):
 @blog_bp.route('/reply/comment/<int:comment_id>')
 def reply_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    return redirect(
-        url_for('.show_post',
-                post_id=comment.post_id,
-                reply=comment_id,
-                author=comment.author) + '#comment-form')
+    if comment.post.can_comment:
+        return redirect(
+            url_for('.show_post',
+                    post_id=comment.post_id,
+                    reply=comment_id,
+                    author=comment.author) + '#comment-form')
+    else:
+        return redirect(url_for('.show_post', post_id=comment_id.post_id))
 
 
 @blog_bp.route('/change-theme/<theme_name>')

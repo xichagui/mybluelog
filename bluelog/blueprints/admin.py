@@ -6,8 +6,8 @@
 # @Software: PyCharm
 
 from bluelog.extensions import db
-from bluelog.forms import PostForm, SettingForm
-from bluelog.models import Category, Post
+from bluelog.forms import CommentForm, PostForm, SettingForm
+from bluelog.models import Category, Comment, Post
 from bluelog.utils import redirect_back
 from flask import (Blueprint, abort, current_app, flash, redirect,
                    render_template, request, url_for)
@@ -35,9 +35,9 @@ def settings():
     return render_template('admin/settings.html', form=form)
 
 
-@admin_bp.route('/post/manager')
+@admin_bp.route('/post/manage')
 @login_required
-def manager_post():
+def manage_post():
     page = request.args.get('page', 1, type=int)
     pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
         page, per_page=current_app.config['BLUELOG_MANAGE_POST_PER_PAGE'])
@@ -90,16 +90,68 @@ def delete_post(post_id):
     return redirect_back()
 
 
-@admin_bp.route('/category/manager')
-def manager_category():
+@admin_bp.route('/category/manage')
+@login_required
+def manage_category():
     abort(404)
 
 
 @admin_bp.route('/new_category')
+@login_required
 def new_category():
     abort(404)
 
 
-@admin_bp.route('/comment/manager')
-def manager_comment():
-    abort(404)
+@admin_bp.route('/comment/manage')
+@login_required
+def manage_comment():
+    filter_rule = request.args.get('filter', 'all')
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['BLUELOG_COMMENT_PER_PAGE']
+    if filter_rule == 'unread':
+        filtered_comments = Comment.query.filter_by(reviewed=False)
+    elif filter_rule == 'admin':
+        filtered_comments = Comment.query.filter_by(from_admin=True)
+    else:
+        filtered_comments = Comment.query
+
+    pagination = filtered_comments.order_by(Comment.timestamp.desc()).paginate(
+        page, per_page=per_page)
+    comments = pagination.items
+    return render_template('admin/manage_comment.html',
+                           pagination=pagination,
+                           comments=comments)
+
+
+@admin_bp.route('/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment delete.', 'success')
+    return redirect_back()
+
+
+@admin_bp.route('/comment/<int:comment_id>/approve', methods=['POST'])
+@login_required
+def approve_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    comment.reviewed = True
+    db.session.commit()
+    flash('Comment reviewed.', 'success')
+    return redirect_back()
+
+
+@admin_bp.route('/set-comment/<int:post_id>', methods=['POST'])
+@login_required
+def set_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.can_comment:
+        post.can_comment = False
+        flash('Comment disabled.', 'info')
+    else:
+        post.can_comment = True
+        flash('Comment enabled.', 'info')
+    db.session.commit()
+    return redirect(url_for('blog.show_post', post_id=post_id))

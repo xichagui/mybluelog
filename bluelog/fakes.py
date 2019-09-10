@@ -21,7 +21,7 @@ def fake_admin():
                   name='ZIO',
                   about="I'm the King of the world.")
 
-    # admin.set_password('helloflask')
+    admin.set_password('12345678')
     db.session.add(admin)
     db.session.commit()
 
@@ -49,6 +49,19 @@ def fake_posts(count=50):
                     timestamp=fake.date_time_this_year())
 
         db.session.add(post)
+
+    salt = int(count * 0.1)
+
+    for i in range(salt):
+        post = Post(title=fake.sentence(),
+                    body=fake.text(2000),
+                    category=Category.query.get(
+                        random.randint(1, Category.query.count())),
+                    timestamp=fake.date_time_this_year(),
+                    can_comment=False)
+
+        db.session.add(post)
+
     db.session.commit()
 
 
