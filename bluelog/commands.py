@@ -73,15 +73,16 @@ def register_commands(app):
         if admin:
             click.echo('The administrator already exists, updating...')
             admin.username = username
-            admin.set_password(password)
+            admin.password = password
         else:
             click.echo('Creating the temporary administrator account...')
             admin = Admin(username=username,
+                          password=password,
                           blog_title='Bluelog',
                           blog_sub_title="No, I'm the real thing",
                           name='ZIO',
                           about='Any thing about ZIO')
-            admin.set_password(password)
+            # admin.set_password(password)
             db.session.add(admin)
 
         category = Category.query.first()

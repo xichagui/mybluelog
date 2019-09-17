@@ -7,9 +7,12 @@
 
 from datetime import datetime
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from bluelog.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
+
 
 
 class Admin(db.Model, UserMixin):
@@ -21,11 +24,17 @@ class Admin(db.Model, UserMixin):
     name = db.Column(db.String(30))
     about = db.Column(db.String(100))
 
-    def set_password(self, password):
+    @hybrid_property
+    def password(self):
+        return self.password_hash
+
+    @password.setter
+    def password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def validate_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 
 
 class Category(db.Model):

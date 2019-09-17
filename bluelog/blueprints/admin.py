@@ -9,7 +9,7 @@ from bluelog.extensions import db
 from bluelog.forms import CategoryForm, PostForm, SettingForm
 from bluelog.models import Category, Comment, Post
 from bluelog.utils import redirect_back
-from flask import (Blueprint, abort, current_app, flash, redirect,
+from flask import (Blueprint, current_app, flash, redirect,
                    render_template, request, url_for)
 from flask_login import current_user, login_required
 
