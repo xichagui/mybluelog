@@ -7,8 +7,8 @@
 
 from urllib.parse import urljoin, urlparse
 
-from bluelog.models import User
 from bluelog.extensions import db
+from bluelog.models import User
 from flask import current_app, redirect, request, url_for
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
