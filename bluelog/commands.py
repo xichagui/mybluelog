@@ -8,7 +8,7 @@
 import click
 
 from bluelog.extensions import db
-from bluelog.models import Admin, Category
+from bluelog.models import Category, User
 
 
 def register_commands(app):
@@ -36,7 +36,7 @@ def register_commands(app):
                   help='Quantity of comments, default is 500.')
     def forge(category, post, comment):
         """Generates the fake categories, posts, and comments"""
-        from bluelog.fakes import fake_admin, fake_categories, fake_posts, fake_comments
+        from bluelog.fakes import fake_admin, fake_categories, fake_posts, fake_comments  # noqa
 
         db.drop_all()
         db.create_all()
@@ -69,19 +69,20 @@ def register_commands(app):
         click.echo('Initializing the database...')
         db.create_all()
 
-        admin = Admin.query.first()
-        if admin:
+        user = User.query.first()
+        if user:
             click.echo('The administrator already exists, updating...')
-            admin.username = username
-            admin.password = password
+            user.username = username
+            user.password = password
         else:
             click.echo('Creating the temporary administrator account...')
-            admin = Admin(username=username,
-                          password=password,
-                          blog_title='Bluelog',
-                          blog_sub_title="No, I'm the real thing",
-                          name='ZIO',
-                          about='Any thing about ZIO')
+            admin = User(username=username,
+                         password=password,
+                         blog_title='Bluelog',
+                         blog_sub_title="No, I'm the real thing",
+                         name='ZIO',
+                         about='Any thing about ZIO',
+                         email='xichagui@gmail.com')
             # admin.set_password(password)
             db.session.add(admin)
 

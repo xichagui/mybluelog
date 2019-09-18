@@ -13,7 +13,7 @@ from bluelog.blueprints.blog import blog_bp
 from bluelog.commands import register_commands
 from bluelog.extensions import (bootstrap, ckeditor, csrf, db, login_manager,
                                 mail, moment)
-from bluelog.models import Admin, Category, Comment
+from bluelog.models import User, Category, Comment
 from bluelog.settings import config
 from flask import Flask, render_template
 from flask_login import current_user
@@ -65,7 +65,7 @@ def register_shell_context(app):
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        admin = Admin.query.first()
+        admin = User.query.first()
         categories = Category.query.order_by(Category.name).all()
         if current_user.is_authenticated:
             unread_comments = Comment.query.filter_by(reviewed=False).count()

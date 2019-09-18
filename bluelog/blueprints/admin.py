@@ -4,7 +4,7 @@
 # @Site    :
 # @File    : admin.py
 # @Software: PyCharm
-
+from bluelog.decorators import confirm_required
 from bluelog.extensions import db
 from bluelog.forms import CategoryForm, PostForm, SettingForm
 from bluelog.models import Category, Comment, Post
@@ -37,6 +37,7 @@ def settings():
 
 @admin_bp.route('/post/manage')
 @login_required
+@confirm_required
 def manage_post():
     page = request.args.get('page', 1, type=int)
     pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
@@ -49,6 +50,7 @@ def manage_post():
 
 @admin_bp.route('/new_post', methods=['GET', 'POST'])
 @login_required
+@confirm_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
@@ -64,6 +66,7 @@ def new_post():
 
 @admin_bp.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
 @login_required
+@confirm_required
 def edit_post(post_id):
     form = PostForm()
     post = Post.query.get_or_404(post_id)
@@ -82,6 +85,7 @@ def edit_post(post_id):
 
 @admin_bp.route('/post/<int:post_id>/delete', methods=['POST'])
 @login_required
+@confirm_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     db.session.delete(post)
@@ -92,12 +96,14 @@ def delete_post(post_id):
 
 @admin_bp.route('/category/manage')
 @login_required
+@confirm_required
 def manage_category():
     return render_template('admin/manage_category.html')
 
 
 @admin_bp.route('/new_category', methods=['GET', 'POST'])
 @login_required
+@confirm_required
 def new_category():
     form = CategoryForm()
     if form.validate_on_submit():
@@ -111,6 +117,7 @@ def new_category():
 
 @admin_bp.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 @login_required
+@confirm_required
 def edit_category(category_id):
     form = CategoryForm()
     category = Category.query.get_or_404(category_id)
@@ -128,6 +135,7 @@ def edit_category(category_id):
 
 @admin_bp.route('/category/<int:category_id>/delete', methods=['POST'])
 @login_required
+@confirm_required
 def delete_category(category_id):
     category = Category.query.get_or_404(category_id)
     if category.id == 1:
@@ -140,6 +148,7 @@ def delete_category(category_id):
 
 @admin_bp.route('/comment/manage')
 @login_required
+@confirm_required
 def manage_comment():
     filter_rule = request.args.get('filter', 'all')
     page = request.args.get('page', 1, type=int)
@@ -161,6 +170,7 @@ def manage_comment():
 
 @admin_bp.route('/comment/<int:comment_id>/delete', methods=['POST'])
 @login_required
+@confirm_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
     db.session.delete(comment)
@@ -171,6 +181,7 @@ def delete_comment(comment_id):
 
 @admin_bp.route('/comment/<int:comment_id>/approve', methods=['POST'])
 @login_required
+@confirm_required
 def approve_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
     comment.reviewed = True
@@ -181,6 +192,7 @@ def approve_comment(comment_id):
 
 @admin_bp.route('/set-comment/<int:post_id>', methods=['POST'])
 @login_required
+@confirm_required
 def set_comment(post_id):
     post = Post.query.get_or_404(post_id)
     if post.can_comment:

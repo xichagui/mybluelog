@@ -7,7 +7,7 @@
 import random
 
 from bluelog import db
-from bluelog.models import Admin, Category, Comment, Post
+from bluelog.models import Category, Comment, Post, User
 from faker import Faker
 from sqlalchemy.exc import IntegrityError
 
@@ -15,13 +15,16 @@ fake = Faker()
 
 
 def fake_admin():
-    admin = Admin(username='admin',
-                  blog_title='Bluelog',
-                  blog_sub_title="No, I'm the real thing.",
-                  name='ZIO',
-                  about="I'm the King of the world.")
+    admin = User(username='admin',
+                 blog_title='Bluelog',
+                 blog_sub_title="No, I'm the real thing.",
+                 name='ZIO',
+                 about="I'm the King of the world.",
+                 password='12345678',
+                 email='xichagui@gmail.com',
+                 confirmed=True)
 
-    admin.set_password('12345678')
+    # admin.set_password('12345678')
     db.session.add(admin)
     db.session.commit()
 
@@ -106,8 +109,7 @@ def fake_comments(count=500):
 
     # replies
     for i in range(salt):
-        replied = Comment.query.get(
-            random.randint(1, Comment.query.count()))
+        replied = Comment.query.get(random.randint(1, Comment.query.count()))
         comment = Comment(author=fake.name(),
                           email=fake.email(),
                           site=fake.url(),

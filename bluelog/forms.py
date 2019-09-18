@@ -5,13 +5,13 @@
 # @File    : forms.py
 # @Software: PyCharm
 
-from bluelog.models import Category
+from bluelog.models import Category, User
 from flask_ckeditor import CKEditorField
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField,
                      StringField, SubmitField, TextAreaField)
-from wtforms.validators import (URL, DataRequired, Email, Length, Optional,
-                                ValidationError)
+from wtforms.validators import (URL, DataRequired, Email, EqualTo, Length,
+                                Optional, Regexp, ValidationError)
 
 
 class LoginForm(FlaskForm):
@@ -79,3 +79,43 @@ class SettingForm(FlaskForm):
                                              Length(1, 100)])
     about = CKEditorField('About Page', validators=[DataRequired()])
     submit = SubmitField()
+
+
+class RegisterForm(FlaskForm):
+    username = StringField(
+        'UserName',
+        validators=[
+            DataRequired(),
+            Length(5, 18),
+            Regexp(
+                '^[a-zA-Z0-9]*$',
+                message='Username should be contain only character or number.')
+        ])
+    password = PasswordField(
+        'Password',
+        validators=[DataRequired(),
+                    Length(8, 20),
+                    EqualTo('password2')])
+    password2 = PasswordField('Confirm password', validators=[DataRequired()])
+    blog_title = StringField('Blog title',
+                             validators=[DataRequired(),
+                                         Length(1, 60)])
+    blog_sub_title = StringField('Blog sub title',
+                                 validators=[DataRequired(),
+                                             Length(0, 100)])
+    name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
+    about = StringField('About', validators=[Length(0, 100)])
+    email = StringField('Email',
+                        validators=[DataRequired(),
+                                    Length(1, 255),
+                                    Email()])
+
+    submit = SubmitField()
+
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('The username is already in use.')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('The email is already in use')

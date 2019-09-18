@@ -8,7 +8,7 @@
 from threading import Thread
 
 from bluelog.extensions import mail
-from flask import current_app, url_for
+from flask import current_app, render_template, url_for
 from flask_mail import Message
 
 
@@ -17,14 +17,22 @@ def _send_async_mail(app, message):
         mail.send(message)
 
 
-def send_mail(subject, to, html):
+def send_mail(subject, to, html=None, template=None, **kwargs):
     allow_to_send_email = current_app.config['ALLOW_TO_SEND_EMAIL']
     if allow_to_send_email:
         app = current_app._get_current_object()
-        message = Message(subject, recipients=[to], html=html)
+        if (kwargs.get('html', None)):
+            message = Message(subject, recipients=[to], html=html)
+        else:
+            message = Message(subject,
+                              recipients=[to],
+                              html=render_template(f'{template}.html',
+                                                   **kwargs))
         thr = Thread(target=_send_async_mail, args=[app, message])
         thr.start()
         return thr
+    else:
+        print(html or render_template(f'{template}.html', **kwargs))
 
 
 def send_new_comment_email(post):
@@ -55,3 +63,11 @@ def send_new_reply_email(comment):
         f'<p><a href="{post_url}">{post_url}</a></p>'
         f'<p><small style="color: #868e96">Do not reply this email.</small></p>'
     )
+
+
+def send_confirm_account_email(user, token, to=None):
+    send_mail(subject='Email Confirm',
+              to=to or user.email,
+              template='emails/confirm',
+              user=user,
+              token=token)

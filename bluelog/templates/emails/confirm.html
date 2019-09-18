@@ -1,0 +1,3 @@
+<p>您在bluelog里注册了新账号, 请点击下面链接进行激活.</p>
+<p><a href="{{ url_for('auth.confirm', token=token, _external=True) }}">{{ url_for('auth.confirm', token=token, _external=True) }}</a></p>
+<p><small style="color: #868e96">Do not reply this email.</small></p>

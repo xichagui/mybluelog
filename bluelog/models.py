@@ -7,22 +7,24 @@
 
 from datetime import datetime
 
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from bluelog.extensions import db
 from flask_login import UserMixin
+from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-
-class Admin(db.Model, UserMixin):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20))
+    username = db.Column(db.String(20), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     blog_title = db.Column(db.String(60))
     blog_sub_title = db.Column(db.String(100))
     name = db.Column(db.String(30))
     about = db.Column(db.String(100))
+    email = db.Column(db.String(255), unique=True, index=True)
+    member_since = db.Column(db.DateTime, default=datetime.utcnow())
+    confirmed = db.Column(db.Boolean, default=False)
+    # posts = db.relationship('Post', back_poulates='user')
 
     @hybrid_property
     def password(self):
@@ -34,7 +36,6 @@ class Admin(db.Model, UserMixin):
 
     def validate_password(self, password):
         return check_password_hash(self.password_hash, password)
-
 
 
 class Category(db.Model):
@@ -60,6 +61,9 @@ class Post(db.Model):
     category = db.relationship('Category', back_populates='posts')
     comments = db.relationship('Comment', back_populates='post', cascade='all')
     can_comment = db.Column(db.Boolean, default=True)
+    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # user = db.relationship('User', back_populates=('posts'))
+
 
 
 class Comment(db.Model):
@@ -68,7 +72,7 @@ class Comment(db.Model):
     email = db.Column(db.String(254))
     site = db.Column(db.String(255))
     body = db.Column(db.Text)
-    from_admin = db.Column(db.Boolean, default=False)
+    from_admin= db.Column(db.Boolean, default=False)
     reviewed = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
