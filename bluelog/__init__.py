@@ -4,19 +4,21 @@
 # @Site    :
 # @File    : __init__.py
 # @Software: PyCharm
-
+import logging
 import os
+from logging.handlers import RotatingFileHandler
 
 from bluelog.blueprints.admin import admin_bp
 from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.commands import register_commands
 from bluelog.extensions import (bootstrap, ckeditor, csrf, db, login_manager,
-                                mail, moment)
-from bluelog.models import User, Category, Comment
+                                mail, moment, toolbar)
+from bluelog.models import Category, Comment, User
 from bluelog.settings import config
-from flask import Flask, render_template
+from flask import Flask, current_app, render_template
 from flask_login import current_user
+from flask_sqlalchemy import get_debug_queries
 from flask_wtf.csrf import CSRFError
 
 
@@ -33,11 +35,25 @@ def create_app(config_name=None):
     register_logging(app)
     register_shell_context(app)
     register_template_context(app)
+    register_request_handlers(app)
     return app
 
 
 def register_logging(app):
-    pass
+    app.logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        '[%(asctime)s][%(name)s][%(levelname)s] -  %(message)s ')
+
+    file_handler = RotatingFileHandler('logs/bluelog.log',
+                                       maxBytes=10 * 1024 * 1024,
+                                       backupCount=10)
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+
+    # if not app.debug:
+    #     app.logger.addHandler(file_handler)
+    app.logger.addHandler(file_handler)
 
 
 def register_extensions(app):
@@ -48,6 +64,7 @@ def register_extensions(app):
     mail.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
+    toolbar.init_app(app)
 
 
 def register_blueprint(app):
@@ -93,3 +110,14 @@ def register_errors(app):
     def handle_csrf_error(e):
         return render_template('errors/400.html',
                                description=e.description), 400
+
+
+def register_request_handlers(app):
+    @app.after_request
+    def query_profiler(response):
+        for q in get_debug_queries():
+            if q.duration >= current_app.config['BLUELOG_SLOW_QUERY_THRESHOLD']:
+                current_app.logger.warning(
+                    f'Slow query: Duration :{q.duration}\nContext:{q.context}\nQuery: {q.statement}\n'
+                )
+        return response

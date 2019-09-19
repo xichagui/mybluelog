@@ -7,6 +7,7 @@
 
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
@@ -20,6 +21,7 @@ ckeditor = CKEditor()
 mail = Mail()
 login_manager = LoginManager()
 csrf = CSRFProtect()
+toolbar = DebugToolbarExtension()
 
 
 @login_manager.user_loader

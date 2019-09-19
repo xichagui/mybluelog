@@ -19,6 +19,8 @@ class BaseConfig(object):
 
     # Flask-SQLAlchemy 将会追踪对象的修改并且发送信号, 耗费内存, 可以关闭
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_RECORD_QUERIES = True
+    BLUELOG_SLOW_QUERY_THRESHOLD = 0.001
 
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = 465
